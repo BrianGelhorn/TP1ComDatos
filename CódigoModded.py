@@ -9,9 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 # Parámetros
-frecuencia_repeticion = 2  # Frecuencia de repetición en Hz
+frecuencia_repeticion = 1  # Frecuencia de repetición en Hz
 amplitud = 1  # Amplitud del pulso
-fs = 10000  # Frecuencia de muestreo
+fs = 1000  # Frecuencia de muestreo
 
 # Tiempo de simulación
 t = np.arange(0, 1, 1/fs)
@@ -24,14 +24,14 @@ for duracion_pulso in duraciones_pulsos:
     # Generación del tren de pulsos
     tren_pulsos = np.zeros_like(t)
     for i in range(math.ceil(t[-1] * frecuencia_repeticion)):
-        tren_pulsos[int(i * fs / frecuencia_repeticion):int(i * fs / frecuencia_repeticion + duracion_pulso * fs)] = amplitud
+        tren_pulsos[int(i * fs / frecuencia_repeticion):int(i * fs / frecuencia_repeticion + duracion_pulso * fs)] = amplitud #Establece la amplitud en cada pulso desde el inicio del 
+                                                                                                                              #pulso hasta el inicio del pulso + la duracion
         
 
     # Transformada de Fourier
-    n = len(tren_pulsos)
-    n_fft = 10 * n 
-    espectro = np.fft.fft(tren_pulsos)
-    frecuencias = np.fft.fftfreq(len(espectro), d=1/fs)
+    espectro = np.fft.fftshift(np.fft.fft(tren_pulsos))/ len(tren_pulsos)
+    frecuencias = np.fft.fftshift(np.fft.fftfreq(len(espectro), d=1/fs))
+    espectroContinuo = amplitud*duracion_pulso*np.sinc(frecuencias*duracion_pulso)
 
     # Visualización del tren de pulsos
     plt.subplot(2, len(duraciones_pulsos), duraciones_pulsos.index(duracion_pulso) + 1)
@@ -43,12 +43,13 @@ for duracion_pulso in duraciones_pulsos:
 
     # Visualización del espectro
     plt.subplot(2, len(duraciones_pulsos), len(duraciones_pulsos) + duraciones_pulsos.index(duracion_pulso) + 1)
-    plt.plot(frecuencias[:len(frecuencias)//2], abs(espectro)[:len(espectro)//2])
+    plt.stem(frecuencias, abs(espectro))
+    plt.plot(frecuencias, abs(espectroContinuo))
     plt.title(f'Espectro de Frecuencia (Duración: {duracion_pulso}s)')
     plt.xlabel('Frecuencia (Hz)')
     plt.ylabel('Magnitud')
     plt.grid()
-    plt.xlim(0, 20)  # Limitar el eje x para enfocarse en las frecuencias relevantes
+    plt.xlim(-50, 50)  # Limitar el eje x para enfocarse en las frecuencias relevantes
 
 plt.tight_layout()
 plt.show()
