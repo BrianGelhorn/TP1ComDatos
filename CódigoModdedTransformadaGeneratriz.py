@@ -14,28 +14,27 @@ amplitud = 1  # Amplitud del pulso
 fs = 1000  # Frecuencia de muestreo
 
 # Tiempo de simulación
-t = np.arange(0, 1, 1/fs)
+t = np.arange(-0.5, 0.5, 1/fs)
 
 # Duraciones de pulso a analizar
-duraciones_pulsos = [0.05, 0.1, 0.2]
+duraciones_pulsos = [0.02, 0.2, 0.5]
 # Crear una figura para visualizar los resultados
 plt.figure(figsize=(12, 8))
 for duracion_pulso in duraciones_pulsos:
     # Generación del tren de pulsos
-    tren_pulsos = np.zeros_like(t)
+    generatriz = np.zeros_like(t)
     for i in range(math.ceil(t[-1] * frecuencia_repeticion)):
-        tren_pulsos[int(i * fs / frecuencia_repeticion):int(i * fs / frecuencia_repeticion + duracion_pulso * fs)] = amplitud #Establece la amplitud en cada pulso desde el inicio del 
-                                                                                                                              #pulso hasta el inicio del pulso + la duracion
-        
+        generatriz[int(len(generatriz)//2-(duracion_pulso/2)*fs):int(len(generatriz)//2+(duracion_pulso/2)*fs)] = amplitud
+        #Creo un pulso siendo este la generatriz centrada en 0
 
-    # Transformada de Fourier
-    espectro = np.fft.fftshift(np.fft.fft(tren_pulsos))/ len(tren_pulsos)
+    # Transformada de Fourier de la generatriz
+    espectro = np.fft.fftshift(np.fft.fft(generatriz, n=len(generatriz)))/ len(generatriz)
     frecuencias = np.fft.fftshift(np.fft.fftfreq(len(espectro), d=1/fs))
     espectroContinuo = amplitud*duracion_pulso*np.sinc(frecuencias*duracion_pulso)
 
     # Visualización del tren de pulsos
     plt.subplot(2, len(duraciones_pulsos), duraciones_pulsos.index(duracion_pulso) + 1)
-    plt.plot(t, tren_pulsos)
+    plt.plot(t, generatriz)
     plt.title(f'Tren de Pulsos (Duración: {duracion_pulso}s)')
     plt.xlabel('Tiempo (s)')
     plt.ylabel('Amplitud')
