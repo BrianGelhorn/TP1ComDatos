@@ -42,8 +42,8 @@ for duracion_pulso in duraciones_pulsos:
 
     # Visualización del espectro
     plt.subplot(2, len(duraciones_pulsos), len(duraciones_pulsos) + duraciones_pulsos.index(duracion_pulso) + 1)
-    plt.stem(frecuencias, abs(espectro))
-    plt.plot(frecuencias, abs(espectroContinuo))
+    plt.stem(frecuencias, abs(espectro)).markerline.set_visible(False)
+    plt.plot(frecuencias, abs(espectroContinuo), "r")
     plt.title(f'Espectro de Frecuencia (Duración: {duracion_pulso}s)')
     plt.xlabel('Frecuencia (Hz)')
     plt.ylabel('Magnitud')
