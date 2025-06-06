@@ -11,7 +11,7 @@ fs = 5000  # Frequency of samples
 t = np.arange(-0.5, .5, 1/fs)
 
 # Duration of the pulses to analyze
-pulses_duration = [0.02, 0.2, 0.5]  # Measured in Seconds
+pulses_duration = [0.05, 0.1, 0.2]  # Measured in Seconds
 
 plt.figure(figsize=(12, 8))
 for pulse_duration in pulses_duration:

@@ -2,15 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-frequency = 3  # Measured in Hz
+frequency = 4  # Measured in Hz
 amplitude = 1  # Amplitude of the pulse
 fs = 5000  # Frequency of samples
 
 # Time of simulation
-t = np.arange(-10, 10, 1/fs)
+t = np.arange(-2, 2, 1/fs)
 
 # Duration of the pulses to analyze
-pulses_duration = [0.02, 0.2, 0.5]  # Measured in Seconds
+pulses_duration = [0.05, 0.1, 0.2]  # Measured in Seconds
 
 plt.figure(figsize=(12, 8))
 for pulse_duration in pulses_duration:
@@ -19,12 +19,16 @@ for pulse_duration in pulses_duration:
     for i in range(int(t[0]*frequency), math.ceil(t[-1] * frequency)):
         pulse_train[int(i * fs / frequency):int(i * fs / frequency + pulse_duration * fs)] = amplitude 
         #I give the value of the amplitud from the index i until the same i plus the duration of the pulse
+    generatriz = np.zeros_like(t)
+    for i in range(math.ceil(t[-1] * frequency)):
+        generatriz[int(len(generatriz)//2-(pulse_duration/2)*fs):int(len(generatriz)//2+(pulse_duration/2)*fs)] = amplitude
+        #I give the value of the amplitud from the index i plus/less the duration of the pulse divided 2 to both sides so I have it centered at 0
 
     # Fourier transform of the pulse train. (Periodic Signal)
     spectrum = np.fft.fftshift(np.fft.fft(pulse_train, n=len(pulse_train)))/ len(pulse_train) #I divide it for the amount of points that the pulse train has to 
                                                                                               #normalize the FFT and we apply shift to map also the negative values
     frequencies = np.fft.fftshift(np.fft.fftfreq(len(spectrum), d=1/fs))
-
+    envelope = frequency*abs(amplitude*pulse_duration*np.sinc(frequencies*pulse_duration))
     # Visualization of each Pulse Train
     plt.subplot(2, len(pulses_duration), pulses_duration.index(pulse_duration) + 1)
     plt.plot(t, pulse_train)
@@ -36,11 +40,12 @@ for pulse_duration in pulses_duration:
     # Visualization of each Spectrum
     plt.subplot(2, len(pulses_duration), len(pulses_duration) + pulses_duration.index(pulse_duration) + 1)
     plt.stem(frequencies, abs(spectrum)).markerline.set_visible(False)
+    # plt.plot(frequencies, envelope, "r--")
     plt.title(f'Frecuency Spectrum (Duration: {pulse_duration}s)')
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Magnitude')
     plt.grid()
-    plt.xlim(-50, 50) #I limit the axis to focus on the most relevant frequencies
+    plt.xlim(-8, 8) #I limit the axis to focus on the most relevant frequencies
 
 plt.tight_layout()
 plt.show()
